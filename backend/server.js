@@ -72,21 +72,11 @@ app.use(cors());
 app.use(bodyParser.json({ limit: "2mb" }));
 app.use("/uploads", express.static(UPLOAD_DIR));
 
-app.get("/", (req, res) => {
+// Backend metadata moved to /api status if needed, but removing from root to allow frontend to serve.
+app.get("/api", (req, res) => {
   res.json({
     name: "ataiyal-robot-backend",
     ok: true,
-    endpoints: {
-      health: "/api/health",
-      createRobot: "POST /api/robots",
-      listRobots: "GET /api/robots",
-      getRobot: "GET /api/robots/:id",
-      uploadDocument:
-        "POST /api/robots/:id/documents (multipart form-data, field: file)",
-      generateQuiz: "POST /api/robots/:id/quiz/generate",
-      qa: "POST /api/robots/:id/qa",
-      chat: "POST /api/chat",
-    },
   });
 });
 
