@@ -1,0 +1,17 @@
+{
+  "name": "ataiyal-robot-learning",
+  "version": "1.0.0",
+  "description": "族語學習",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "npm --prefix backend run dev",
+    "client": "npm --prefix frontend start",
+    "start": "node backend/server.js",
+    "build": "npm --prefix frontend run build",
+    "install-all": "npm install && npm --prefix backend install && npm --prefix frontend install"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
