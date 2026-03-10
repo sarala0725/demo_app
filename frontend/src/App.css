@@ -1,0 +1,27 @@
+.App {
+  text-align: center;
+}
+
+/* ===== Pixel Icon Styles ===== */
+.pixel-icon {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+/* Icon sizes */
+.pixel-icon-sm  { width: 20px; height: 20px; }
+.pixel-icon-md  { width: 28px; height: 28px; }
+.pixel-icon-lg  { width: 36px; height: 36px; }
+.pixel-icon-xl  { width: 48px; height: 48px; }
+
+/* Slight bounce animation for decorative icons */
+@keyframes pixel-bounce {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-3px); }
+}
+.pixel-icon-bounce {
+  animation: pixel-bounce 1.8s ease-in-out infinite;
+}
