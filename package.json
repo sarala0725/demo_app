@@ -1,7 +1,7 @@
 {
   "name": "ataiyal-robot-learning",
   "version": "1.0.0",
-  "description": "族語學習",
+  "description": "族語學習 ",
   "private": true,
   "scripts": {
     "dev": "concurrently \"npm run server\" \"npm run client\"",
