@@ -1190,12 +1190,24 @@ async function maybeAnswerWithLlm({ question, excerpts }) {
 }
 
 // Serve static files from the React frontend build
-const frontendBuildPath = path.join(__dirname, "../frontend/build");
+const frontendBuildPath = path.resolve(__dirname, "..", "frontend", "build");
+
+if (fs.existsSync(frontendBuildPath)) {
+  console.log(`[backend] Serving static files from: ${frontendBuildPath}`);
+} else {
+  console.warn(`[backend] WARNING: Frontend build path NOT found: ${frontendBuildPath}`);
+}
+
 app.use(express.static(frontendBuildPath));
 
 // Catch-all route to serve the React index.html for any frontend client-side routing
 app.get("*", (req, res) => {
-  res.sendFile(path.join(frontendBuildPath, "index.html"));
+  const indexPath = path.join(frontendBuildPath, "index.html");
+  if (fs.existsSync(indexPath)) {
+    res.sendFile(indexPath);
+  } else {
+    res.status(404).send("Frontend build not found. Please run 'npm run build' in the frontend directory.");
+  }
 });
 
 app.listen(PORT, () => {
