@@ -207,6 +207,7 @@ app.post(
           let kind = "unknown";
           let rawText = "";
 
+          console.time(`[DOC_PROCESS] ${filename}`);
           if (ext === ".pdf") {
             kind = "pdf";
             rawText = await parsePdf(req.file.path);
@@ -260,7 +261,8 @@ app.post(
 
               if (validImages.length > 0) {
                 rawText += "\n\n【附圖參考】\n" + validImages.map(filename => {
-                  return `![教材圖片](http://localhost:${PORT}/uploads/images/${id}/${filename})`;
+                  // Use relative path for production compatibility
+                  return `![教材圖片](/uploads/images/${id}/${filename})`;
                 }).join('\n');
               }
             } catch (imgError) {
@@ -287,6 +289,7 @@ app.post(
                   } catch (e) {
                     console.error("[LANG DETECT] Failed", e);
                   }
+                  console.timeEnd(`[DOC_PROCESS] ${filename}`);
 
                   res.json({
                     id,
