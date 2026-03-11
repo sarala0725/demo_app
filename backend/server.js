@@ -184,6 +184,12 @@ app.post(
   upload.single("file"),
   async (req, res) => {
     const robotId = req.params.id;
+    console.log(`[UPLOAD] Starting upload request for robot ${robotId}`);
+    if (req.file) {
+      console.log(`[UPLOAD] File received: ${req.file.originalname} (${req.file.size} bytes)`);
+    } else {
+      console.log(`[UPLOAD] No file received in request`);
+    }
 
     db.get(
       "SELECT id FROM robots WHERE id = ?",

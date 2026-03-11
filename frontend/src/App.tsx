@@ -335,7 +335,7 @@ function normalizeConfig(input: any): RobotConfig {
   };
 }
 
-const API_BASE_URL = 'https://demo-app-hs6a.onrender.com';
+const API_BASE_URL = process.env.NODE_ENV === 'development' ? '' : 'https://demo-app-hs6a.onrender.com';
 
 async function apiJson<T>(url: string, init?: RequestInit): Promise<T> {
   const fullUrl = url.startsWith('/') ? `${API_BASE_URL}${url}` : url;
