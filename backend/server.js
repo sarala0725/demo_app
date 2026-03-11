@@ -441,7 +441,7 @@ let currentGeminiKeyIndex = 0;
 async function callGeminiChat({ apiKey, model, system, user }) {
   const { GoogleGenAI } = require('@google/genai');
 
-  const keysStr = process.env.GEMINI_API_KEYS || process.env.GEMINI_API_KEY || apiKey || "AIzaSyDO3L8XmbMaC37y5Y2_oYXfHcivQKQQGBc";
+  const keysStr = process.env.GEMINI_API_KEYS || process.env.GEMINI_API_KEY || apiKey || "";
   const keys = keysStr.split(',').map(k => k.trim()).filter(Boolean);
 
   let lastError = null;
@@ -493,7 +493,7 @@ app.post("/api/chat", async (req, res) => {
     return res.status(400).json({ error: "user is required" });
   }
 
-  const apiKey = process.env.GEMINI_API_KEY || "AIzaSyDO3L8XmbMaC37y5Y2_oYXfHcivQKQQGBc";
+  const apiKey = process.env.GEMINI_API_KEY;
   const geminiModel = process.env.GEMINI_MODEL || model || "gemini-2.5-flash";
 
   try {
@@ -637,7 +637,7 @@ function normalizeQuiz(quiz) {
 }
 
 async function maybeGenerateQuizWithGemini({ excerpts }) {
-  const apiKey = process.env.GEMINI_API_KEY || "AIzaSyDO3L8XmbMaC37y5Y2_oYXfHcivQKQQGBc";
+  const apiKey = process.env.GEMINI_API_KEY;
   const model = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 
   const context = (excerpts || [])
@@ -674,7 +674,7 @@ async function maybeGenerateQuizWithGemini({ excerpts }) {
 }
 
 async function detectLanguageWithGemini(textSample) {
-  const apiKey = process.env.GEMINI_API_KEY || "AIzaSyDO3L8XmbMaC37y5Y2_oYXfHcivQKQQGBc";
+  const apiKey = process.env.GEMINI_API_KEY;
   const model = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 
   if (!textSample || !textSample.trim()) return "";
@@ -953,7 +953,7 @@ function buildStructuredText(structured) {
 }
 
 async function maybeAnswerWithGemini({ question, excerpts }) {
-  const apiKey = process.env.GEMINI_API_KEY || "AIzaSyDO3L8XmbMaC37y5Y2_oYXfHcivQKQQGBc";
+  const apiKey = process.env.GEMINI_API_KEY;
   const model = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 
   const context = (excerpts || [])
@@ -1032,7 +1032,7 @@ function defaultPromptChips() {
 }
 
 async function maybeGeneratePromptChips({ excerpts }) {
-  const apiKey = process.env.GEMINI_API_KEY || "AIzaSyDO3L8XmbMaC37y5Y2_oYXfHcivQKQQGBc";
+  const apiKey = process.env.GEMINI_API_KEY;
   const model = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 
   const context = (excerpts || [])

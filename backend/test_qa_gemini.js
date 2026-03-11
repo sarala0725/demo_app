@@ -22,7 +22,7 @@ const system = "你是一位親切、具循序漸進教學理念的語言學習�
 
 const user = "問題：教材重點整理\n\n教材摘錄：【摘錄 1】\nU pasubanaay cira.";
 
-const apiKey = process.env.GEMINI_API_KEY || "AIzaSyBaiEXlZEPchyEsycaSx4cp7ozyt9PHqCk";
+const apiKey = process.env.GEMINI_API_KEY;
 
 callGeminiChat({ apiKey, model: 'gemini-2.5-flash', system, user })
     .then(res => console.log("SUCCESS:", res))

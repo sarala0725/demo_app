@@ -15,7 +15,7 @@ function safeJsonParseMaybe(s) {
 }
 
 async function run() {
-    const apiKey = 'AIzaSyBaiEXlZEPchyEsycaSx4cp7ozyt9PHqCk';
+    const apiKey = process.env.GEMINI_API_KEY;
     const model = 'gemini-2.5-flash';
     const question = "眼睛";
     const excerpts = [{ text: "U mata kini. U tangila kini." }];

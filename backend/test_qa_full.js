@@ -42,7 +42,7 @@ async function run() {
             const top = ranked.slice(0, 3);
             const excerpts = top.map(t => ({ text: t.row.text }));
 
-            const apiKey = 'AIzaSyBaiEXlZEPchyEsycaSx4cp7ozyt9PHqCk';
+            const apiKey = process.env.GEMINI_API_KEY;
             const model = 'gemini-2.5-flash';
             const context = excerpts.map((e, i) => `【摘錄 ${i + 1}】\n${e.text}`).join("\n\n");
             const system = "你是一位親切、樂於助人的語言學習導師。你的回答要自然、具啟發性且有順序性地幫助學生，且必須完全基於「教材摘錄」。\n" +
