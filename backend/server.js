@@ -228,52 +228,67 @@ app.post(
           const id = uuidv4();
           const createdAt = new Date().toISOString();
 
+          // Move heavy image extraction to background to prevent 502 Timeout on Render
           if (ext === ".pdf") {
-            try {
-              const exportModule = await import('pdf-export-images');
-              const exportImages = exportModule.exportImages || exportModule.default;
+            const filePath = req.file.path;
+            const docId = id;
+            (async () => {
+              console.log(`[BACKGROUND] Starting image extraction for doc ${docId}...`);
+              try {
+                const exportModule = await import('pdf-export-images');
+                const exportImages = exportModule.exportImages || exportModule.default;
 
-              const outDir = path.join(UPLOAD_DIR, 'images', id);
-              if (!fs.existsSync(outDir)) {
-                fs.mkdirSync(outDir, { recursive: true });
-              }
+                const outDir = path.join(UPLOAD_DIR, 'images', docId);
+                if (!fs.existsSync(outDir)) {
+                  fs.mkdirSync(outDir, { recursive: true });
+                }
 
-              const images = await exportImages(req.file.path, outDir);
+                const images = await exportImages(filePath, outDir);
 
-              const validImages = [];
-              if (images && images.length > 0) {
-                for (const img of images) {
-                  const imgPath = typeof img === 'string' ? img : img.name || img.file;
-                  let filename = path.basename(imgPath);
-                  if (!filename.toLowerCase().endsWith('.png')) {
-                    filename += '.png';
-                  }
+                const validImages = [];
+                if (images && images.length > 0) {
+                  for (const img of images) {
+                    const imgPath = typeof img === 'string' ? img : img.name || img.file;
+                    let filename = path.basename(imgPath);
+                    if (!filename.toLowerCase().endsWith('.png')) {
+                      filename += '.png';
+                    }
 
-                  const fullPath = path.join(outDir, filename);
-                  if (fs.existsSync(fullPath)) {
-                    const stats = fs.statSync(fullPath);
-                    // Filter out likely background images (e.g., < 25KB)
-                    if (stats.size > 5000) {
-                      validImages.push(filename);
-                    } else {
-                      // Optional: delete small images to save space
-                      try { fs.unlinkSync(fullPath); } catch (e) { }
+                    const fullPath = path.join(outDir, filename);
+                    if (fs.existsSync(fullPath)) {
+                      const stats = fs.statSync(fullPath);
+                      // Filter out likely background images
+                      if (stats.size > 5000) {
+                        validImages.push(filename);
+                      } else {
+                        // Optional: delete small images to save space
+                        try { fs.unlinkSync(fullPath); } catch (e) { }
+                      }
                     }
                   }
                 }
-              }
 
-              console.log("[PDF EXTRACT] Extracted large images:", validImages.length);
+                console.log(`[BACKGROUND] Extracted large images for doc ${docId}:`, validImages.length);
 
-              if (validImages.length > 0) {
-                rawText += "\n\n【附圖參考】\n" + validImages.map(filename => {
-                  // Use relative path for production compatibility
-                  return `![教材圖片](/uploads/images/${id}/${filename})`;
-                }).join('\n');
+                if (validImages.length > 0) {
+                  const appendedText = "\n\n【附圖參考】\n" + validImages.map(filename => {
+                    return `![教材圖片](/uploads/images/${docId}/${filename})`;
+                  }).join('\n');
+
+                  // Update documents db asynchronously
+                  db.run("UPDATE documents SET raw_text = raw_text || ? WHERE id = ?", [appendedText, docId]);
+
+                  // Insert the new chunk
+                  db.get("SELECT MAX(chunk_index) as max_idx FROM document_chunks WHERE document_id = ?", [docId], (err, row) => {
+                    const nextIdx = (row && row.max_idx !== null) ? row.max_idx + 1 : 999;
+                    db.run("INSERT INTO document_chunks (id, document_id, robot_id, chunk_index, text, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+                      [uuidv4(), docId, robotId, nextIdx, appendedText.trim(), new Date().toISOString()]);
+                  });
+                }
+              } catch (imgError) {
+                console.error(`[BACKGROUND EXCEPTION] PDF image export failed for ${docId}:`, imgError);
               }
-            } catch (imgError) {
-              console.error("[PDF EXTRACT ERROR] PDF image export failed:", imgError);
-            }
+            })();
           }
 
           const chunks = chunkText(rawText);
